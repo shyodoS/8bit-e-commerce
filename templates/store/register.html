@@ -1,0 +1,140 @@
+<!-- store/register.html -->
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="register-wrapper">
+    <div class="register-container">
+        <div class="register-header">
+            <h1 class="register-title">Crie sua conta</h1>
+            <p class="register-subtitle">Junte-se à comunidade 8BitStore</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="register-form">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <div class="form-column">
+                    <!-- Dados Pessoais -->
+                    <div class="form-group">
+                        <label for="{{ form.first_name.id_for_label }}">Nome Completo*</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="form-error">{{ form.first_name.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.username.id_for_label }}">Nome de Usuário*</label>
+                        {{ form.username }}
+                        <small class="form-hint">Escolha um nome único para sua conta</small>
+                        {% if form.username.errors %}
+                            <div class="form-error">{{ form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.email.id_for_label }}">E-mail*</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="form-error">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-column">
+                    <!-- Foto de Perfil -->
+                    <div class="form-group photo-upload">
+                        <label>Foto de Perfil (Opcional)</label>
+                        <div class="upload-area">
+                            <label for="id_foto" class="upload-preview">
+                                <img id="preview-img" src="{% static 'images/imagem_padrao.png' %}" alt="Pré-visualização">
+                                <span class="upload-text">Clique para adicionar uma foto</span>
+                            </label>
+                            <input type="file" name="foto" id="id_foto" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Senha -->
+            <div class="form-section">
+                <h3 class="section-title">Segurança</h3>
+                <div class="form-grid">
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="{{ form.password1.id_for_label }}">Senha*</label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                                <div class="form-error">{{ form.password1.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="{{ form.password2.id_for_label }}">Confirme a Senha*</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="form-error">{{ form.password2.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações de Entrega -->
+            <div class="form-section">
+                <h3 class="section-title">Informações de Entrega</h3>
+                <div class="form-grid">
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="{{ form.telefone.id_for_label }}">Telefone*</label>
+                            {{ form.telefone }}
+                            <small class="form-hint">Inclua DDD e celular com WhatsApp</small>
+                            {% if form.telefone.errors %}
+                                <div class="form-error">{{ form.telefone.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="{{ form.endereco.id_for_label }}">Endereço Completo*</label>
+                            {{ form.endereco }}
+                            {% if form.endereco.errors %}
+                                <div class="form-error">{{ form.endereco.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-register">
+                <span>Criar Conta</span>
+                <i class="fas fa-arrow-right btn-icon"></i>
+            </button>
+        </form>
+
+        <div class="login-redirect">
+            Já tem uma conta? <a href="{% url 'store:login' %}" class="login-link">Faça login</a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Pré-visualização da imagem
+document.getElementById('id_foto').addEventListener('change', function(e) {
+    const preview = document.getElementById('preview-img');
+    const file = e.target.files[0];
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            document.querySelector('.upload-text').style.display = 'none';
+        }
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+{% endblock %}

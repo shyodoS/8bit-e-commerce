@@ -1,0 +1,12 @@
+{% extends "store/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-danger text-center">
+        <h2>Oops! Problema de Segurança</h2>
+        <p>Sua sessão expirou ou houve um erro inesperado. Por segurança, precisamos que você recarregue a página.</p>
+        <a href="{% url 'store:home' %}" class="btn btn-primary">Voltar à Página Inicial</a>
+        <a href="{{ request.path }}" class="btn btn-secondary">Recarregar Página</a>
+    </div>
+</div>
+{% endblock %}

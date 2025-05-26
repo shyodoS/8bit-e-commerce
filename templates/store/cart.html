@@ -1,0 +1,67 @@
+{% extends "store/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<div class="cart-container">
+    <h2>Seu Carrinho</h2>
+
+    <!-- Exibe mensagens de sucesso/erro -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if cart_items %}
+    <div class="products-container">
+        {% for item in cart_items %}
+        <div class="product-card">
+            <div class="product-image">
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+            </div>
+            <div class="product-details">
+                <h3 class="product-name">{{ item.product.name }}</h3>
+                <p class="product-price">R$ {{ item.product.price|intcomma }}</p>
+                
+                <!-- Controles de quantidade (agora com formulários POST) -->
+                <div class="cart-quantity-controls">
+                    <!-- Formulário para REMOVER -->
+                    <form method="post" action="{% url 'store:remove_from_cart' item.id %}" class="inline-form">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-quantity">-</button>
+                    </form>
+                    
+                    <span class="quantity">{{ item.quantity }}</span>
+                    
+                    <!-- Formulário para ADICIONAR -->
+                    <form method="post" action="{% url 'store:add_to_cart' item.product.id %}" class="inline-form">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-quantity">+</button>
+                    </form>
+                </div>
+                
+                <p class="product-total">Subtotal: R$ {{ item.total_item|floatformat:2 }}</p>
+                
+                <!-- Formulário para REMOVER TODAS AS UNIDADES -->
+                <form method="post" action="{% url 'store:delete_from_cart' item.id %}" class="inline-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-remove">Remover Item</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Total geral -->
+    <div class="grand-total">
+        <strong>TOTAL DO CARRINHO: R$ {{ total|floatformat:2 }}</strong>
+        <a href="{% url 'store:checkout' %}" class="btn-checkout">Finalizar Compra</a>
+    </div>
+    {% else %}
+    <p class="empty-cart">Seu carrinho está vazio.</p>
+    {% endif %}
+</div>
+{% endblock %}

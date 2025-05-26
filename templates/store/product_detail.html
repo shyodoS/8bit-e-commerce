@@ -1,0 +1,134 @@
+{% extends "store/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ product.name }} - 8BitStore{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+<style>
+    /* Estilos adicionais para o formulário */
+    .inline-form {
+        display: inline-block;
+        margin-right: 10px;
+    }
+    .btn-secondary {
+        padding: 10px 20px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="product-detail">
+    <div class="container">
+        <!-- Exibe mensagens de sucesso/erro -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="product-detail-container">
+            <div class="product-image-gallery">
+                <div class="main-image">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                </div>
+            </div>
+            
+            <div class="product-info">
+                <h1 class="product-title">{{ product.name }}</h1>
+                
+                <div class="product-meta">
+                    <span class="product-category">
+                        <a href="{% url 'store:product_list_by_category' product.category.slug %}">
+                            {{ product.category.name }}
+                        </a>
+                    </span>
+                    {% if product.is_new %}
+                        <span class="product-badge">Novo</span>
+                    {% endif %}
+                </div>
+                
+                <div class="product-price">R$ {{ product.price|intcomma }}</div>
+                
+                <div class="product-description">
+                    {{ product.description|linebreaks }}
+                </div>
+                
+                <div class="product-actions">
+                    {% if user.is_authenticated %}
+                        <!-- FORMULÁRIO PARA ADICIONAR AO CARRINHO -->
+                        <form method="post" action="{% url 'store:add_to_cart' product.id %}" class="inline-form">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary">
+                                Adicionar ao Carrinho
+                            </button>
+                        </form>
+                        
+                        <a href="{% url 'store:checkout' %}" class="btn btn-secondary">
+                            Comprar Agora
+                        </a>
+                        
+                        <button class="btn-favorite" data-product-id="{{ product.id }}">
+                            {% if product in user.favorites.all %}
+                            <a href="{% url 'store:remove_favorite' product.id %}" class="btn-favorite">
+                                <i class="fas fa-heart"></i> Remover dos Favoritos
+                            </a>
+                        {% else %}
+                            <a href="{% url 'store:add_favorite' product.id %}" class="btn-favorite">
+                                <i class="far fa-heart"></i> 
+                            </a>
+                        {% endif %}
+                        </button>
+                    {% else %}
+                        <!-- Usuário NÃO LOGADO -->
+                        <a href="{% url 'store:login' %}?next={{ request.path }}" class="btn btn-primary">
+                            Faça Login para Comprar
+                        </a>
+                        <a href="{% url 'store:register' %}?next={{ request.path }}" class="btn btn-outline">
+                            Cadastre-se Grátis
+                        </a>
+                        <div class="login-hint">
+                            <small>Você precisa estar logado para favoritar ou comprar</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="related-products">
+    <div class="container">
+        <h2 class="section-title">Produtos Relacionados</h2>
+        <div class="products-container">
+            {% for product in related_products %}
+                <div class="product-card">
+                    <a href="{% url 'store:product_detail' product.slug %}" class="product-link">
+                        <div class="product-image">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% if product.is_new %}
+                                <span class="new-badge">Novo</span>
+                            {% endif %}
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-name">{{ product.name }}</h3>
+                            <p class="product-price">R$ {{ product.price|intcomma }}</p>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,43 @@
+corrigir erro token query
+
+
+    categories = Category.objects.prefetch_related(
+    Prefetch('products', 
+            queryset=Product.objects.filter(available=True).order_by('-created')
+    )
+).all()
+
+
+
+
+
+EightBit Helpercv
+
+
+.btn-favorite {
+    background: none;
+    border: none;
+    color: #d25252;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 5px;
+}
+
+.btn-faorite:hover {
+    transform: scale(1.2);
+}
+
+.btn-favorite i {
+    margin-right: 5px;
+}
+
+/* Estilo quando já está favoritado */
+.btn-favorite .fas.fa-heart {
+    color: #d25252;
+}
+
+/* Estilo quando não está favoritado */
+.btn-favorite .far.fa-heart {
+    color: var(--primary-color);
+}

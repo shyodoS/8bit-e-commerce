@@ -1,0 +1,83 @@
+{% extends 'store/base.html' %} {% load static %} {% block title %}8BitStore -
+Home{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css\styles.css' %}" />
+{% endblock %} {% block content %}
+<link rel="stylesheet" href="{% static 'css/carousel.css' %}" />
+<!-- Seção do Carrossel com Autoplay -->
+<section class="new-products py-5">
+  <div class="container">
+    <h2 class="text-center mb-5">Nossos Lançamentos</h2>
+
+    <div class="multi-item-carousel">
+      <div class="carousel-inner">
+        {% for product in new_products %}
+        <div class="carousel-product">
+          <div class="card h-100">
+            <img
+              src="{{ product.image.url }}"
+              class="card-img-top carousel-img"
+              alt="{{ product.name }}"
+            />
+            <div class="card-body text-center">
+              <h5 class="card-title">{{ product.name|truncatechars:25 }}</h5>
+              <p class="card-text">R$ {{ product.price }}</p>
+              <a
+                href="{{ product.get_absolute_url }}"
+                class="btn btn-sm btn-outline-primary"
+                >Ver Detalhes</a
+              >
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="no-products-message">
+          Nenhum produto disponível no momento
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Controles -->
+      <button class="carousel-control prev">❮</button>
+      <button class="carousel-control next">❯</button>
+
+      <!-- Indicadores gerados automaticamente pelo JS -->
+      <div class="carousel-indicators"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Seção de Todos os Produtos -->
+<section class="products-grid">
+  <div class="container">
+    <h2 class="section-title">Todos os Produtos</h2>
+    <div class="products-container">
+      {% for product in all_products %}
+      <div class="product-card">
+        {% if product.is_new %}
+        <span class="product-badge">Novo</span>
+        {% endif %}
+        <div class="product-image">
+          <img
+            src="{{ product.image.url }}"
+            alt="{{ product.name }}"
+            loading="lazy"
+          />
+        </div>
+        <div class="product-details">
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-price">R$ {{ product.price }}</p>
+          <a href="{{ product.get_absolute_url }}" class="btn btn-buy"
+            >Ver Detalhes</a
+          >
+        </div>
+      </div>
+      {% empty %}
+      <p class="no-products">Nenhum produto disponível no momento.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %} {% block extra_js %}
+<script src="{% static 'js/carousel.js' %}"></script>
+{% endblock %}

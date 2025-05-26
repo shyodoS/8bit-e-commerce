@@ -1,0 +1,84 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block title %}Login - 8BitStore{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'store/css/login_register.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-container">
+        <div class="login-header">
+            <h1 class="login-title">Acesse sua conta</h1>
+            <p class="login-subtitle">Entre para continuar suas compras</p>
+        </div>
+        
+        <form method="post" class="login-form">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="login-alert">
+                <span class="alert-icon">!</span>
+                <p>Usuário ou senha incorretos. Por favor, tente novamente.</p>
+            </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="username">Usuário ou E-mail*</label>
+                <input type="text" id="username" name="username" required placeholder="Digite seu usuário ou e-mail">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha*</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••">
+                <div class="password-toggle">
+                    <input type="checkbox" id="show-password">
+                    <label for="show-password">Mostrar senha</label>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-page-login">
+                    <span class="btn-text">Entrar</span>
+                    <span class="btn-icon">→</span>
+                </button>
+            </div>
+            
+            <div class="login-links">
+                <a href="{% url 'store:password_reset' %}" class="forgot-password">Esqueceu sua senha?</a>
+                <p class="register-redirect">Não tem uma conta? <a href="{% url 'store:register' %}" class="register-link">Cadastre-se</a></p>
+            </div>
+        </form>
+        
+        <div class="social-login">
+            <p class="social-divider">ou entre com</p>
+            <div class="social-buttons">
+                <button class="social-btn google-btn">
+                    <i class="fab fa-google"></i>
+                    <span>Google</span>
+                </button>
+                <button class="social-btn facebook-btn">
+                    <i class="fab fa-facebook-f"></i>
+                    <span>Facebook</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mostrar/ocultar senha
+    const showPassword = document.getElementById('show-password');
+    const passwordField = document.getElementById('password');
+    
+    if (showPassword && passwordField) {
+        showPassword.addEventListener('change', function() {
+            passwordField.type = this.checked ? 'text' : 'password';
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}8BitStore{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'images/logo_favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'images/logo_favicon.ico' %}" type="image/x-icon">
+
+    <!-- CSS (removida a duplicação) -->
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    
+
+    <link rel="stylesheet" href="{% static 'css/carousel.css' %}">
+    
+    <!-- Fontes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <div class="hamburger-menu">
+                <input type="checkbox" id="menu-toggle">
+                <label for="menu-toggle" class="menu-button">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </label>
+                
+                <nav class="main-nav" id="mainNav">
+
+                    <h1 class="text-hamburger acessorios-font">CATEGORIAS</h1>
+
+
+                    <ul class="categories-menu">
+                        {% for category in categories %}
+                            <li>
+                                <h2>
+                                <a href="{% url 'store:product_list_by_category' category.slug %}">
+                                    {{ category.name }}
+                                </a>
+                                </h2>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+            
+            <div class="logo-container">
+                <a href="{% url 'store:home' %}" class="logo">
+                    <img src="{% static 'images/logo.png' %}" alt="8BitStore Logo" loading="lazy">
+                    <span>8BitStore</span>
+                </a>
+            </div>
+
+            <div class="user-actions">
+                {% if user.is_authenticated %}
+                <!-- Usuário LOGADO -->
+                <div class="user-menu">
+                    {% if user.is_authenticated %}
+                    <div class="profile-dropdown">
+                        <button class="profile-btn">
+                            {% if user.perfil.foto %}
+                                <img src="{{ user.perfil.foto.url }}" alt="Foto de {{ user.username }}" class="profile-icon">
+                            {% else %}
+                                <img src="{% static 'images/imagem_padrao.png' %}" alt="Foto padrão" class="profile-icon">
+                            {% endif %}
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="{% url 'store:perfil' %}"><i class="fas fa-user"></i> Meu Perfil</a>
+                            <a href="{% url 'store:logout' %}"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                        </div>
+                    </div>
+                    {% else %}
+                        <a href="{% url 'store:login' %}" class="btn-login">Entrar</a>
+                    {% endif %}
+                </div>
+                    <div class="logged-user">
+                        <span class="username">{{ user.username }}</span>
+                        <a href="{% url 'store:logout' %}" class="btn-logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <!-- Usuário NÃO LOGADO -->
+                    <a href="{% url 'store:login' %}?next={{ request.path }}" class="btn btn-login">Entrar</a>
+                    <a href="{% url 'store:register' %}" class="btn btn-register">Cadastrar</a>
+                {% endif %}
+                
+                <a href="{% url 'store:cart' %}" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    {% if user.is_authenticated and user.cart_items.count > 0 %}
+                        <span class="cart-count">{{ user.cart_items.count }}</span>
+                    {% else %}
+                        <span class="cart-count">0</span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">{% block content %}{% endblock %}</div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="copyright">
+                &copy; {% now "Y" %} 8BitStore - Todos os direitos reservados
+            </div>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/carousel.js' %}"></script>
+    <script>
+        // Mostra mensagens do Django
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = document.querySelectorAll('.messages li');
+            messages.forEach(msg => {
+                setTimeout(() => {
+                    msg.style.opacity = '0';
+                    setTimeout(() => msg.remove(), 500);
+                }, 3000);
+            });
+        });
+        </script>
+    {% block extra_js %}{% endblock %}
+    <div id="toast" class="toast-hidden">
+        <span id="toast-message"></span>
+    </div>
+</body>
+</html>

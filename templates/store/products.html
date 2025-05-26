@@ -1,0 +1,65 @@
+{% extends "store/base.html" %} {% load static %}  
+{% block title %}{{ product.name }} - 8BitStore{% endblock %} 
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="product-detail">
+    <div class="container">
+        <div class="product-detail-container">
+            <div class="product-image-gallery">
+                <div class="main-image">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                </div>
+            </div>
+            
+            <div class="product-info">
+                <h1 class="product-title">{{ product.name }}</h1>
+                
+                <div class="product-category">
+                    <a href="{% url 'store:product_list_by_category' product.category.slug %}">{{ product.category.name }}</a>
+                </div>
+                
+                <div class="product-price-detail">R${{ product.price }}</div>
+                
+                <div class="product-description">
+                    {{ product.description|linebreaks }}
+                </div>
+                
+                <div class="product-actions">
+                    <button class="btn btn-primary btn-add-to-cart">Adicionar ao Carrinho</button>
+                    <button class="btn btn-secondary btn-buy-now">Comprar Agora</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+    
+<section class="related-products">
+    <div class="container">
+        <h2 class="section-title">Produtos Relacionados</h2>
+        <div class="products-container">
+            {% for product in related_products %}
+                <div class="product-card">
+                    <a href="{% url 'store:product_detail' product.slug %}" class="product-link">
+                        <div class="product-image">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-name">{{ product.name }}</h3>
+                            <p class="product-price">R${{ product.price }}</p>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/product_detail.js' %}"></script>
+{% endblock %}

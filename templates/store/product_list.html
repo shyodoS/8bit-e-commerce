@@ -1,0 +1,47 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block title %}{{ category.name|default:"Todos os Produtos" }} - 8BitStore{% endblock %}
+
+{% block content %}
+    <section class="category-header">
+        <div class="container">
+            {% if category %}
+                <h1>{{ category.name }}</h1>
+                {% if category.description %}
+                    <p class="category-description">{{ category.description }}</p>
+                {% endif %}
+            {% else %}
+                <h1>Todos os Produtos</h1>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="products-grid">
+        <div class="container">
+            <div class="products-container">
+                {% for product in products %}
+                    <div class="product-card">
+                        {% if product.is_new %}
+                            <span class="product-badge">NOVO</span>
+                        {% endif %}
+                        <a href="{% url 'store:product_detail' product.slug %}" class="product-link">
+                            <div class="product-image">
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            </div>
+                            <div class="product-details">
+                                <h3 class="product-name">{{ product.name }}</h3>
+                                <p class="product-price">R${{ product.price }}</p>
+                                <button class="btn btn-buy">COMPRAR</button>
+                            </div>
+                        </a>
+                    </div>
+                {% empty %}
+                    <div class="no-products">
+                        <p>Nenhum produto disponível nesta categoria.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

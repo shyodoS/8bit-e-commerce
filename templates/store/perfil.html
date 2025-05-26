@@ -1,0 +1,173 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Cabeçalho do Perfil -->
+    <div class="profile-header">
+        <div class="profile-pic-container">
+            {% if user.perfil.foto %}
+                <img src="{{ user.perfil.foto.url }}" alt="Foto de {{ user.username }}" class="profile-pic">
+            {% else %}
+                <img src="{% static 'images/imagem_padrao.png' %}" alt="Foto padrão" class="profile-pic">
+            {% endif %}
+            
+            <div class="profile-info">
+                <h2>{{ user.get_full_name|default:user.username }}</h2>
+                <p class="profile-email">{{ user.email }}</p>
+                <p class="profile-joined">Membro desde {{ user.date_joined|date:"d/m/Y" }}</p>
+            </div>
+        </div>
+        
+        <form method="POST" enctype="multipart/form-data" class="profile-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.foto.id_for_label }}">Alterar Foto</label>
+                {{ form.foto }}
+                <small class="form-hint">Formatos: JPG, PNG (máx. 2MB)</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.telefone.id_for_label }}">Telefone</label>
+                {{ form.telefone }}
+                {% if form.telefone.errors %}
+                    <div class="form-error">{{ form.telefone.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.endereco.id_for_label }}">Endereço</label>
+                {{ form.endereco }}
+                {% if form.endereco.errors %}
+                    <div class="form-error">{{ form.endereco.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <button type="submit" class="btn-save">Salvar Alterações</button>
+        </form>
+    </div>
+
+    <!-- Abas -->
+    <div class="profile-tabs">
+        <button class="tab-btn active" data-tab="carrinho">Carrinho ({{ cart_items.count }})</button>
+        <button class="tab-btn" data-tab="favoritos">Favoritos ({{ favorites.count }})</button>
+        <button class="tab-btn" data-tab="compras">Minhas Compras</button>
+    </div>
+
+    <!-- Conteúdo das Abas -->
+    <div class="tab-content active" id="carrinho-tab">
+        {% if cart_items %}
+            <div class="products-container">  <!-- Mudei para products-container -->
+                {% for item in cart_items %}
+                    <div class="product-card">
+                        {% if item.product.is_new %}
+                        <span class="product-badge">Novo</span>
+                        {% endif %}
+                        <div class="product-image">
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" loading="lazy">
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-name">{{ item.product.name }}</h3>
+                            <p class="product-price">R$ {{ item.product.price }}</p>
+                            <p class="product-quantity">Quantidade: {{ item.quantity }}</p>
+                            <div class="product-actions">
+                                <a href="{% url 'store:remove_from_cart' item.id %}" class="btn-remove">➖</a>
+                                <a href="{% url 'store:delete_from_cart' item.id %}" class="btn-delete">❌</a>
+                                <a href="{{ item.product.get_absolute_url }}" class="btn-buy">Ver Detalhes</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="cart-total">
+                <h4>Total: R$ {{ total_carrinho|floatformat:2 }}</h4>
+                <a href="{% url 'store:checkout' %}" class="btn-checkout">Finalizar Compra</a>
+            </div>
+        {% else %}
+            <p class="empty-message">Seu carrinho está vazio.</p>
+        {% endif %}
+    </div>
+
+    <div class="tab-content" id="favoritos-tab">
+        {% if favorites %}
+            <div class="products-container">  <!-- Mudei para products-container -->
+                {% for fav in favorites %}
+                    <div class="product-card">
+                        {% if fav.product.is_new %}
+                        <span class="product-badge">Novo</span>
+                        {% endif %}
+                        <div class="product-image">
+                            <img src="{{ fav.product.image.url }}" alt="{{ fav.product.name }}" loading="lazy">
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-name">{{ fav.product.name }}</h3>
+                            <p class="product-price">R$ {{ fav.product.price }}</p>
+                            <div class="product-actions">
+                                <a href="{% url 'store:add_to_cart' fav.product.id %}" class="btn-cart">🛒</a>
+                                <a href="{% url 'store:remove_favorite' fav.product.id %}" class="btn-fav">❤️</a>
+                                <a href="{{ fav.product.get_absolute_url }}" class="btn-buy">Ver Detalhes</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-message">Nenhum favorito ainda.</p>
+        {% endif %}
+    </div>
+
+    <div class="tab-content" id="compras-tab">
+        {% if pedidos %}
+            <div class="orders-list">
+                {% for pedido in pedidos %}
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">Pedido #{{ pedido.id }}</span>
+                            <span class="order-date">{{ pedido.data_pedido|date:"d/m/Y" }}</span>
+                            <span class="order-status">{{ pedido.get_status_display }}</span>
+                            <span class="order-total">R$ {{ pedido.total }}</span>
+                        </div>
+                        <div class="order-products">
+                            {% for item in pedido.itens.all %}
+                                <div class="order-product">
+                                    <img src="{{ item.produto.image.url }}" alt="{{ item.produto.nome }}">
+                                    <span>{{ item.produto.nome }} ({{ item.quantidade }}x)</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-message">Nenhum pedido realizado ainda.</p>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'store:logout' %}" class="btn-logout">Sair</a>
+</div>
+
+<!-- JavaScript das Abas -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.tab-btn');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove todas as classes ativas
+            document.querySelectorAll('.tab-btn, .tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Ativa a aba clicada
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab') + '-tab';
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+    
+    // Ativa a primeira aba por padrão
+    document.querySelector('.tab-btn').click();
+});
+</script>
+{% endblock %}
