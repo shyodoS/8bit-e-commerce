@@ -1,0 +1,16 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8004:8000"  # Porta 8004 para store
+    volumes:
+      - .:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    environment:
+      - DEBUG=False
+      - ALLOWED_HOSTS=localhost,127.0.0.1,store.8bitlab.com.br,72.60.252.126
+
+volumes:
+  static_volume:
+  media_volume:
